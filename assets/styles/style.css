@@ -48,19 +48,23 @@ body {
 }
 
 .msg {
-    position: absolute;
+    position: fixed;
     border-radius: 1rem;
     padding: .8rem;
     color: #fff;
-    transition: top .5s ease;
     transform: translateY(-200px);
-    transition: transform .5s ease;
+    z-index: 1;
 }
-
 
 .msg.active {
     transform: translateY(0px);
+    transition: transform .5s ease;
 }
+.msg.attention {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
 
 .btn {
     padding: .8rem 2rem;
@@ -230,6 +234,29 @@ body {
 
 .msg.ok {
     background: rgb(75, 239, 30);
+}
+
+.msg.attention {
+    background: rgb(241, 131, 20);
+    text-align: center;
+}
+
+.msg.attention button {
+    margin: .4rem;
+    border: none;
+    margin-top: 1rem;
+    border-radius: .4rem;
+    padding: .6rem 2rem;
+    cursor: pointer;
+    transition: background .5s ease;
+}
+.msg.attention button.yes:hover {
+    background-color: rgb(255, 47, 47);
+    color: #fff;
+}
+.msg.attention button.no:hover {
+    background-color: rgba(0, 144, 26, 0.956);
+    color: #fff;
 }
 
 .btn.edit {

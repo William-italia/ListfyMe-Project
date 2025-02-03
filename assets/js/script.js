@@ -10,104 +10,10 @@ const form = document.querySelector('#form');
 const itemInput = document.querySelector('#item-input');
 const add =document.querySelector('.add');
 const edit =document.querySelector('.edit');
+// const msgText = document.querySelector('.msg-text');
 
 let timeOutId;
 let editMode = false;
-
-
-
-
-
-form.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const item = itemInput.value;
-
-    if(item.trim() != '') {
-        showMsg('Item adicionado com sucesso!', 'ok');
-        
-        list.prepend(createItem(item));
-
-        itemInput.value = '';
-        
-        itemInput.focus();
-        
-        verifiedFilter();
-        verifiedList();
-        clearFil();
-    } else {
-        showMsg('Por favor adicione um item!', 'erro');
-        return;
-    }
-});
-
-
-// dark mode
-boxTheme.addEventListener('click', (e) => {
-    body.classList.toggle('dark');
-
-    if (body.classList.contains('dark')) {
-        boxTheme.innerHTML = `<img src="./assets/img/sun-regular.svg" alt="">`;
-        localStorage.setItem('theme', 'dark'); // Salva o modo dark
-    } else {
-        boxTheme.innerHTML = `<img src="./assets/img/moon.png" alt="">`;
-        localStorage.setItem('theme', ''); // Salva o modo light
-    }
-});
-
-list.addEventListener('click', (e) => {
-
-
-    removeItem(e);
-    clearFil();
-    verifiedList();
-    verifiedFilter();
-});
-
-
-function removeItem(e) {
-    if(e.target && e.target.closest('button').classList.contains('remove-item')) {
-        const listItem = e.target.closest('li');
-
-        listItem ? listItem.remove() : '';    
-        showMsg('Item apagado com sucesso!', 'ok');
-
-    }
-}
-
-// clear
-clear.addEventListener('click', () => {
-    list.replaceChildren();
-
-    showMsg('Todos os items foram apagados com sucesso!!!', 'ok');
-    verifiedList();
-});
-
-// filtro
-filter.addEventListener('input', () => {
-    const filterText = filter.value.toLowerCase();
-
-    Array.from(items).forEach(item => {
-        const itemText = item.textContent.toLowerCase();
-
-        if (itemText.includes(filterText)) {
-            item.style.display = 'flex';
-        } else {
-            item.style.display = 'none';
-        }
-    });
-
-    verifiedFilter();
-});
-
-
-// limpeza do filtro
-clearFilter.addEventListener('click', (e) => {
-    
-    clearFil();
-    verifiedFilter();
-});
-
 
 function verificaTema() {
     const savedTheme = localStorage.getItem('theme');
@@ -154,30 +60,105 @@ function clearFil() {
 
 }
 
-function showMsg(content, type) {
 
-    msg.textContent = content;
+function showMsg(text, type) {
 
-    if (msg.classList.contains('erro') || msg.classList.contains('ok')){
+    if (type === 'attention') {
+        
+        msg.replaceChildren();
+
+        const p = document.createElement('p');
+        p.classList.add('msg-text');
+        p.textContent = text;
+
+        const btnYes = document.createElement('button');
+        btnYes.classList.add('yes');
+        btnYes.textContent = 'Sim';
+        const btnNo = document.createElement('button');
+        btnNo.classList.add('no');
+        btnNo.textContent = 'Não';
+
+        msg.appendChild(p);
+        msg.appendChild(btnYes);
+        msg.appendChild(btnNo);
+
+        msg.classList.add('active');
+        msg.classList.add('attention');
+
+        msg.addEventListener('click', attentionClear);
+
+    }
+
+    if (type !== 'attention'){
+
+        msg.replaceChildren();
+
+        const p = document.createElement('p');
+        p.classList.add('msg-text');
+        p.textContent = text;
+
+        msg.appendChild(p);
+
         msg.classList.remove('erro');
         msg.classList.remove('ok');
+        msg.classList.remove('attention');
+
+
+        msg.classList.add(type);
+    
+        msg.classList.add('active');
+
+        if(timeOutId) {
+            clearTimeout(timeOutId);
+        }
+        
+        timeOutId = setTimeout(() => {
+            msg.classList.remove('active');
+            setTimeout(() => {
+                msg.classList.remove(type);
+            }, 500);
+        }, 2000);
+
     }
 
-    msg.classList.add(type);
     
-    msg.classList.add('active');
-
-    if(timeOutId) {
-        clearTimeout(timeOutId);
-    }
     
-    timeOutId = setTimeout(() => {
-        msg.classList.remove('active');
-        setTimeout(() => {
-            msg.classList.remove(type);
-        }, 500);
-    }, 2000);
 }
+
+function attentionClear(e) {
+
+    msg.classList.remove('erro');
+    msg.classList.remove('attention');
+    msg.classList.remove('ok');
+
+    if(e.target && e.target.tagName === 'BUTTON') {
+        
+        if(e.target.classList.contains('yes')) {
+            list.replaceChildren();
+
+            msg.classList.remove('active');
+            msg.classList.remove('attention');
+
+            setTimeout(()=> {
+                showMsg('Lista apagada com sucesso!', 'ok');
+            }, 500)
+            toggleClear();
+            verifiedFilter();
+            verifiedList();
+        } else {
+            msg.classList.remove('active');
+            msg.classList.remove('attention');
+        }
+    }
+}
+
+// clear
+clear.addEventListener('click', () => {
+
+    showMsg('Você tem certeza que deseja apagar todos os items da lista?', 'attention');
+    verifiedList();
+    toggleClear();
+});
 
 function verifiedList() {
     if (list.children.length > 1) {
@@ -192,14 +173,20 @@ function verifiedList() {
 function verifiedFilter() {
     if (filter.value !== '' && list.children.length > 1) {
         clearFilter.style.display = 'block';
+        
     } else {
         clearFilter.style.display = 'none';
+        // clear.style.display = 'block'
     }
 }
 
-// list.addEventListener('click', (e) => {
-//     console.log(e.target);
-// });
+function toggleClear() {
+    if(filter.value === '' && list.children.length > 1) {
+        clear.style.display = 'block';
+    } else {
+        clear.style.display = 'none';
+    }
+}
 
 function verifiedEdit() {
     
@@ -212,6 +199,99 @@ function verifiedEdit() {
     }
 }
 
+function removeItem(e) {
+    if(e.target && e.target.closest('button').classList.contains('remove-item')) {
+        const listItem = e.target.closest('li');
+
+        listItem ? listItem.remove() : '';    
+
+        showMsg('Item apagado com sucesso!', 'ok');
+
+    }
+}
+
+
+
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const item = itemInput.value;
+
+    if(item.trim() != '') {
+        showMsg('Item adicionado com sucesso!', 'ok');
+        
+        list.prepend(createItem(item));
+
+        itemInput.value = '';
+        
+        itemInput.focus();
+        
+        verifiedFilter();
+        verifiedList();
+        clearFil();
+    } else {
+        showMsg('Por favor adicione um item!', 'erro');
+        return;
+    }
+});
+
+
+// dark mode
+boxTheme.addEventListener('click', (e) => {
+    body.classList.toggle('dark');
+
+    if (body.classList.contains('dark')) {
+        boxTheme.innerHTML = `<img src="./assets/img/sun-regular.svg" alt="">`;
+        localStorage.setItem('theme', 'dark'); // Salva o modo dark
+    } else {
+        boxTheme.innerHTML = `<img src="./assets/img/moon.png" alt="">`;
+        localStorage.setItem('theme', ''); // Salva o modo light
+    }
+});
+
+list.addEventListener('click', (e) => {
+
+    removeItem(e);
+    toggleClear();
+    clearFil();
+    verifiedList();
+    verifiedFilter();
+});
+
+
+
+
+// filtro
+filter.addEventListener('input', () => {
+    const filterText = filter.value.toLowerCase();
+
+    Array.from(items).forEach(item => {
+        const itemText = item.textContent.toLowerCase();
+
+        if (itemText.includes(filterText)) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+
+    toggleClear();
+    verifiedFilter();
+});
+
+
+// limpeza do filtro
+clearFilter.addEventListener('click', (e) => {
+    
+    clearFil();
+    verifiedFilter();
+    toggleClear();
+});
+
+
+
+
+toggleClear();
 verifiedEdit();
 verifiedList();
 verifiedFilter();

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping List</title>
+    <link rel="shortcut icon" href="Vector.png" type="image/x-icon">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <div class="global-container">
+        <div class="list-main-container">
+            <p class="msg"></p>
+            <h1><i class="fa-solid fa-shop"></i>Shopping List</h1>
+            <form method="" action="" id="item-form">
+                <input class="input-item" type="text" placeholder="Enter item">
+                <button class="add"><i class="fa-solid fa-plus"></i> Add Item</button>
+            </form>
+            <div class="filter-container">
+                <input class="input-filter" type="text" placeholder="Filter items">
+            </div>
+            <ul class="list-items">
+                <li>Item 1 <button class="remove-item"><i class="fa-solid fa-xmark"></i></button></li>
+                <li>Item 2 <button class="remove-item"><i class="fa-solid fa-xmark"></i></button></li>
+                <li>Item 3 <button class="remove-item"><i class="fa-solid fa-xmark"></i></button></li>
+                <li>Item 4 <button class="remove-item"><i class="fa-solid fa-xmark"></i></button></li>
+                <li>Item 5 <button class="remove-item"><i class="fa-solid fa-xmark"></i></button></li>
+            </ul>
+            <button class="clear">Clear All</button>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+</body>
+
+</html>

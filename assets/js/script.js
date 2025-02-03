@@ -10,6 +10,7 @@ const form = document.querySelector('#form');
 const itemInput = document.querySelector('#item-input');
 const add =document.querySelector('.add');
 const edit =document.querySelector('.edit');
+
 let timeOutId;
 let editMode = false;
 
@@ -35,7 +36,8 @@ form.addEventListener('submit', (e) => {
         verifiedList();
         clearFil();
     } else {
-        showMsg('Não foi possivel adicionar', 'erro');
+        showMsg('Por favor adicione um item!', 'erro');
+        return;
     }
 });
 
@@ -56,15 +58,6 @@ boxTheme.addEventListener('click', (e) => {
 list.addEventListener('click', (e) => {
 
 
-    if(e.target && e.target.tagName === 'LI') {
-        editMode = true;
-
-        itemInput.value = e.target.textContent;
-
-        e.target.style.border = '3px solid rgb(75, 239, 30)';
-    }
-    
-    verifiedEdit();
     removeItem(e);
     clearFil();
     verifiedList();
@@ -164,8 +157,14 @@ function clearFil() {
 function showMsg(content, type) {
 
     msg.textContent = content;
-    msg.classList.add(type);
 
+    if (msg.classList.contains('erro') || msg.classList.contains('ok')){
+        msg.classList.remove('erro');
+        msg.classList.remove('ok');
+    }
+
+    msg.classList.add(type);
+    
     msg.classList.add('active');
 
     if(timeOutId) {

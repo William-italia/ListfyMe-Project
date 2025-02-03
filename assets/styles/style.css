@@ -52,6 +52,7 @@ body {
     border-radius: 1rem;
     padding: .8rem;
     color: #fff;
+    width: 70%;
     transform: translateY(-200px);
     z-index: 1;
 }

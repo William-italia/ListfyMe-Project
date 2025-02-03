@@ -2,6 +2,12 @@ const boxTheme = document.querySelector('.box-theme');
 const body = document.body;
 boxTheme.addEventListener('click', (e) => {
     body.classList.toggle('dark');
+
+    if(body.classList.contains('dark')) {
+        boxTheme.innerHTML = `<img src="./assets/img/sun-regular.svg" alt="">`;
+    } else {
+        boxTheme.innerHTML = `<img src="./assets/img/moon.png" alt="">`;
+    };
 });
 
 

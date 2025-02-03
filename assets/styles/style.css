@@ -34,6 +34,8 @@ body {
     transition: all .5s ease;
 }
 
+.sol {
+}
 .dark {
     background-color: var(--escuro-color);
     color: var(--claro-color);

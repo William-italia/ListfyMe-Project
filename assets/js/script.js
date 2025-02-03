@@ -11,6 +11,20 @@ const itemInput = document.querySelector('#item-input');
 
 let timeOutId;
 
+const savedTheme = localStorage.getItem('theme');
+
+console.log(savedTheme);
+
+if(savedTheme === 'dark') {
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark');
+    } else {
+        // Caso contrário, garante que o tema light seja aplicado
+        document.body.classList.remove('dark');
+    }
+}
+
+
 form.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -20,6 +34,7 @@ form.addEventListener('submit', (e) => {
         showMsg('Item adicionado com sucesso!', 'ok');
         
         list.prepend(createItem(item));
+
         itemInput.value = '';
         
         itemInput.focus();
@@ -37,12 +52,13 @@ form.addEventListener('submit', (e) => {
 boxTheme.addEventListener('click', (e) => {
     body.classList.toggle('dark');
 
-    if(body.classList.contains('dark')) {
+    if (body.classList.contains('dark')) {
         boxTheme.innerHTML = `<img src="./assets/img/sun-regular.svg" alt="">`;
+        localStorage.setItem('theme', 'dark'); // Salva o modo dark
     } else {
         boxTheme.innerHTML = `<img src="./assets/img/moon.png" alt="">`;
-    };
-    
+        localStorage.setItem('theme', ''); // Salva o modo light
+    }
 });
 
 list.addEventListener('click', (e) => {
@@ -53,8 +69,6 @@ list.addEventListener('click', (e) => {
         showMsg('Item apagado com sucesso!', 'ok');
 
     }
-    
-    
     
     clearFil();
     verifiedList();

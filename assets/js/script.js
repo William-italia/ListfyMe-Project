@@ -17,9 +17,10 @@ console.log(savedTheme);
 
 if(savedTheme === 'dark') {
     if (savedTheme === 'dark') {
+        boxTheme.innerHTML = `<img src="./assets/img/sun-regular.svg" alt="">`;
         document.body.classList.add('dark');
     } else {
-        // Caso contrário, garante que o tema light seja aplicado
+        boxTheme.innerHTML = `<img src="./assets/img/moon.png" alt="">`;
         document.body.classList.remove('dark');
     }
 }

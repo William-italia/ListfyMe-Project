@@ -231,3 +231,20 @@ body {
 .msg.ok {
     background: rgb(75, 239, 30);
 }
+
+.btn.edit {
+    background: rgb(75, 239, 30);
+    color: #000;
+}
+
+.btn.edit i {
+    color: #000;
+}
+.dark .btn.edit {
+    background: rgb(75, 239, 30);
+    color: #fff;
+}
+
+.dark .btn.edit i {
+    color: #fff;
+}

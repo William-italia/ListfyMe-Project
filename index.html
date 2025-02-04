@@ -19,10 +19,13 @@
 
 <body class="dak">
     <div class="container">
-        <div class="msg">
-            <!-- <p class="msg-text"></p> -->
+        <div class="msg attention">
+            <p class="msg-text">Você tem certeza que deseja apagar todos os items da lista?</p>
             <button class="yes">Sim</button>
             <button class="no">Não</button>
+        </div>
+        <div class="flash-msg ">
+            <p class="msg-text"></p>
         </div>
         <div class="box-menu">
             <h2 id="logo" translate="no">List<span class="color">fy</span>Me</h2>
@@ -34,7 +37,7 @@
             <div class="box-form">
                 <input type="text" id="item-input" name="item-input" placeholder="Meu item">
                 <button class="btn add">+ Adicionar item</button>
-                <button class="btn edit"><i class="fa-regular fa-pen-to-square"></i> Confirmar</button>
+                <!-- <button class="btn edit"><i class="fa-regular fa-pen-to-square"></i> Confirmar</button> -->
             </div>
         </form>
         <div class="box-filter">
@@ -42,15 +45,17 @@
             <i class="fa-solid fa-x clear-filter"></i>
         </div>
         <ul class="list-items">
-            <li>Item 1<button class="remove-item"><i class="fa-solid fa-x"></i></button></li>
+            <!-- <li>Item 1<button class="remove-item"><i class="fa-solid fa-x"></i></button></li>
             <li>Item 2<button class="remove-item"><i class="fa-solid fa-x"></i></button></li>
             <li>Item 3<button class="remove-item"><i class="fa-solid fa-x"></i></button></li>
             <li>Item 4<button class="remove-item"><i class="fa-solid fa-x"></i></button></li>
-            <li>Item 5<button class="remove-item"><i class="fa-solid fa-x"></i></button></li>
+            <li>Item 5<button class="remove-item"><i class="fa-solid fa-x"></i></button></li> -->
         </ul>
         <button id="clear" class="btn">Limpar Lista</button>
     </div>
-
+    <ul class="list-false">
+        <!-- <li>Item 5<button class="remove-item"><i class="fa-solid fa-x"></i></button></li> -->
+    </ul>
 
     <script src="./assets/js/script.js" defer></script>
 </body>

@@ -1,40 +1,212 @@
-const boxTheme = document.querySelector('.box-theme');
 const body = document.body;
+const boxTheme = document.querySelector('.box-theme');
 const filter = document.querySelector('.filter-input');
 const clear = document.querySelector('#clear');
 const msg = document.querySelector('.msg');
+const flashMsg = document.querySelector('.flash-msg');
 const list = document.querySelector('.list-items');
 const items = list.getElementsByTagName('li');
-const clearFilter = document.querySelector('.clear-filter');
+const closeFilter = document.querySelector('.clear-filter');
 const form = document.querySelector('#form');
 const itemInput = document.querySelector('#item-input');
 const add =document.querySelector('.add');
 const edit =document.querySelector('.edit');
-// const msgText = document.querySelector('.msg-text');
 
 let timeOutId;
-let editMode = false;
 
-function verificaTema() {
+function displayItems() {
+    const itemsFromStorage = getItemsFromStorage();
+
+    itemsFromStorage.forEach((item) => {
+        addItemToDOM(item);
+    });
+
+    checkUI();
+}
+
+
+function toggleTheme() {
     const savedTheme = localStorage.getItem('theme');
 
     if(savedTheme === 'dark') {
-        if (savedTheme === 'dark') {
-            boxTheme.innerHTML = `<img src="./assets/img/sun-regular.svg" alt="">`;
-            document.body.classList.add('dark');
+        boxTheme.innerHTML = `<img src="./assets/img/sun-regular.svg" alt="">`;
+        document.body.classList.add('dark');
+    } else {
+        boxTheme.innerHTML = `<img src="./assets/img/moon.png" alt="">`;
+        document.body.classList.remove('dark');
+    }
+}
+
+function onClickTheme() {
+    body.classList.toggle('dark');
+
+    if (body.classList.contains('dark')) {
+        boxTheme.innerHTML = `<img src="./assets/img/sun-regular.svg" alt="">`;
+        localStorage.setItem('theme', 'dark'); 
+    } else {
+        boxTheme.innerHTML = `<img src="./assets/img/moon.png" alt="">`;
+        localStorage.setItem('theme', ''); 
+        // localStorage.clear('theme'); 
+    }
+}
+
+function Clear() {
+
+    confirmClear();
+}
+
+
+function onClickItem(e) {
+    if(e.target && e.target.closest('button').classList.contains('remove-item')) {
+        removeItem(e);
+        removeItemLocalStorage(e);
+    }
+}
+
+function removeItemLocalStorage(item) {
+    item = item.target.closest('li').textContent;
+    
+    let itemsFromStorage = getItemsFromStorage();
+
+    // Filtrar e atualizar a variável corretamente
+    itemsFromStorage = itemsFromStorage.filter(i => i !== item);
+
+    // Atualizar o localStorage
+    localStorage.setItem('items', JSON.stringify(itemsFromStorage));
+}
+
+
+function removeItem(item) {
+    const listItem = item.target.closest('li');
+
+    listItem ? listItem.remove() : null;
+
+    showFlashMsg('ok', 'Item removido com sucesso!');
+    checkUI();
+}
+
+function onFilter() {
+    const filterText = filter.value.toLowerCase();
+
+    Array.from(items).forEach(item => {
+        const itemText = item.textContent.toLowerCase();
+
+        if(itemText.includes(filterText)) {
+            item.style.display = 'flex';
         } else {
-            boxTheme.innerHTML = `<img src="./assets/img/moon.png" alt="">`;
-            document.body.classList.remove('dark');
+            item.style.display = 'none';
+        }
+    });
+
+    checkFilter();
+}
+
+function onCloseFilter() {
+    filter.value = '';
+
+    Array.from(items).forEach(item => {
+        item.style.display = 'flex';
+    });
+
+    checkFilter();
+}
+
+function checkFilter() {
+    if(filter.value !== '') {
+        closeFilter.style.display = 'block';
+    } else {
+        closeFilter.style.display = 'none';
+    }
+}
+
+function checkUI() {
+    if (list.children.length > 1) {
+        clear.style.display = 'block';
+        filter.style.display = 'block';
+    } else {
+        clear.style.display = 'none';
+        filter.style.display = 'none';
+    }
+}
+
+function createP(classe, text) {
+    const p = document.createElement('p');
+    p.classList.add(classe);
+    p.textContent = text;
+
+    return p;
+}
+function createBtn(classe, text) {
+    const btn = document.createElement('button');
+    btn.classList.add(classe);
+    btn.textContent = text;
+
+    return btn;
+}
+
+function showFlashMsg(type, text) {
+
+    flashMsg.replaceChildren();
+
+
+    const p = createP('teste', text);
+
+    flashMsg.appendChild(p);
+
+    flashMsg.classList.add('active');
+    flashMsg.classList.add(type);
+
+    if(timeOutId) {
+        clearTimeout(timeOutId);
+    }
+    
+    timeOutId = setTimeout(() => {
+        flashMsg.classList.remove('active');
+        setTimeout(() => {
+            flashMsg.classList.remove(type);
+        }, 500);
+    }, 2000);
+}
+
+function confirmClear() {
+
+    msg.classList = 'msg attention';
+    
+    msg.replaceChildren();
+    
+    const p = createP('msg-text', 'Você tem certeza que deseja apagar todos os items da lista?')
+
+    const btnYes = createBtn('yes', 'Sim');
+    const btnNo = createBtn('no', 'Não');
+
+    msg.appendChild(p);
+    msg.appendChild(btnYes);
+    msg.appendChild(btnNo);
+
+    msg.classList.add('active');
+    msg.classList.add('attention');
+}
+
+function onClickAlertMsg(e) {
+    if(e.target && e.target.tagName === 'BUTTON') {
+        
+        if(e.target.classList.contains('yes')) {
+            list.replaceChildren();
+
+            msg.classList.remove('active');
+          
+            checkUI();
+
+        } else {
+            msg.classList.remove('active');
         }
     }
-
 }
 
 function createText(item) {
     const text = document.createTextNode(item);
     return text;
 }
-
 
 function createItem(item) {
 
@@ -51,429 +223,66 @@ function createItem(item) {
 
 }
 
-function clearFil() {
-    filter.value = '';
-        
-    Array.from(items).forEach(item => {
-        item.style.display = 'flex';
-    });
-
-}
-
-
-function showMsg(text, type) {
-
-    if (type === 'attention') {
-        
-        msg.replaceChildren();
-
-        const p = document.createElement('p');
-        p.classList.add('msg-text');
-        p.textContent = text;
-
-        const btnYes = document.createElement('button');
-        btnYes.classList.add('yes');
-        btnYes.textContent = 'Sim';
-        const btnNo = document.createElement('button');
-        btnNo.classList.add('no');
-        btnNo.textContent = 'Não';
-
-        msg.appendChild(p);
-        msg.appendChild(btnYes);
-        msg.appendChild(btnNo);
-
-        msg.classList.add('active');
-        msg.classList.add('attention');
-
-        msg.addEventListener('click', attentionClear);
-
-    }
-
-    if (type !== 'attention'){
-
-        msg.replaceChildren();
-
-        const p = document.createElement('p');
-        p.classList.add('msg-text');
-        p.textContent = text;
-
-        msg.appendChild(p);
-
-        msg.classList.remove('erro');
-        msg.classList.remove('ok');
-        msg.classList.remove('attention');
-
-
-        msg.classList.add(type);
-    
-        msg.classList.add('active');
-
-        if(timeOutId) {
-            clearTimeout(timeOutId);
-        }
-        
-        timeOutId = setTimeout(() => {
-            msg.classList.remove('active');
-            setTimeout(() => {
-                msg.classList.remove(type);
-            }, 500);
-        }, 2000);
-
-    }
-
-    
-    
-}
-
-function attentionClear(e) {
-
-    msg.classList.remove('erro');
-    msg.classList.remove('attention');
-    msg.classList.remove('ok');
-
-    if(e.target && e.target.tagName === 'BUTTON') {
-        
-        if(e.target.classList.contains('yes')) {
-            list.replaceChildren();
-
-            msg.classList.remove('active');
-            msg.classList.remove('attention');
-
-            setTimeout(()=> {
-                showMsg('Lista apagada com sucesso!', 'ok');
-            }, 500)
-            toggleClear();
-            verifiedFilter();
-            verifiedList();
-        } else {
-            msg.classList.remove('active');
-            msg.classList.remove('attention');
-        }
-    }
-}
-
-// clear
-clear.addEventListener('click', () => {
-
-    showMsg('Você tem certeza que deseja apagar todos os items da lista?', 'attention');
-    verifiedList();
-    toggleClear();
-});
-
-function verifiedList() {
-    if (list.children.length > 1) {
-        clear.style.display = 'block';
-        filter.style.display = 'block';
-    } else {
-        clear.style.display = 'none';
-        filter.style.display = 'none';
-    }
-}
-
-function verifiedFilter() {
-    if (filter.value !== '' && list.children.length > 1) {
-        clearFilter.style.display = 'block';
-        
-    } else {
-        clearFilter.style.display = 'none';
-        // clear.style.display = 'block'
-    }
-}
-
-function toggleClear() {
-    if(filter.value === '' && list.children.length > 1) {
-        clear.style.display = 'block';
-    } else {
-        clear.style.display = 'none';
-    }
-}
-
-function verifiedEdit() {
-    
-    if(editMode === true) {
-        add.style.display = 'none';
-        edit.style.display = 'block';
-    } else {
-        add.style.display = 'block';
-        edit.style.display = 'none';
-    }
-}
-
-function removeItem(e) {
-    if(e.target && e.target.closest('button').classList.contains('remove-item')) {
-        const listItem = e.target.closest('li');
-
-        listItem ? listItem.remove() : '';    
-
-        showMsg('Item apagado com sucesso!', 'ok');
-
-    }
-}
-
-
-
-form.addEventListener('submit', (e) => {
+function onAddItemSubmit(e) {
     e.preventDefault();
 
-    const item = itemInput.value;
+    const newItem = itemInput.value.trim();
 
-    if(item.trim() != '') {
-        showMsg('Item adicionado com sucesso!', 'ok');
-        
-        list.prepend(createItem(item));
-
-        itemInput.value = '';
-        
-        itemInput.focus();
-        
-        verifiedFilter();
-        verifiedList();
-        clearFil();
-    } else {
-        showMsg('Por favor adicione um item!', 'erro');
+    if (newItem === '') {
+        showFlashMsg('erro', 'Por favor adicione um item!');
         return;
     }
-});
+
+    addItemToDOM(newItem);
+    addItemToStorage(newItem);
 
 
-// dark mode
-boxTheme.addEventListener('click', (e) => {
-    body.classList.toggle('dark');
+    checkUI();
 
-    if (body.classList.contains('dark')) {
-        boxTheme.innerHTML = `<img src="./assets/img/sun-regular.svg" alt="">`;
-        localStorage.setItem('theme', 'dark'); // Salva o modo dark
-    } else {
-        boxTheme.innerHTML = `<img src="./assets/img/moon.png" alt="">`;
-        localStorage.setItem('theme', ''); // Salva o modo light
-    }
-});
+    itemInput.value = '';
+    itemInput.focus();
+}
 
-list.addEventListener('click', (e) => {
+function addItemToDOM(newItem) {
 
-    removeItem(e);
-    toggleClear();
-    clearFil();
-    verifiedList();
-    verifiedFilter();
-});
+     list.prepend(createItem(newItem));
 
+};
 
+    function addItemToStorage(item) { 
 
+        let itemsFromStorage = getItemsFromStorage();
 
-// filtro
-filter.addEventListener('input', () => {
-    const filterText = filter.value.toLowerCase();
-
-    Array.from(items).forEach(item => {
-        const itemText = item.textContent.toLowerCase();
-
-        if (itemText.includes(filterText)) {
-            item.style.display = 'flex';
-        } else {
-            item.style.display = 'none';
+        if(itemsFromStorage.includes(item)) {
+            return;
         }
-    });
-
-    toggleClear();
-    verifiedFilter();
-});
-
-
-// limpeza do filtro
-clearFilter.addEventListener('click', (e) => {
-    
-    clearFil();
-    verifiedFilter();
-    toggleClear();
-});
-
-
-
-
-toggleClear();
-verifiedEdit();
-verifiedList();
-verifiedFilter();
-verificaTema();
-
-// document.addEventListener('DOMContentLoaded', () => {
-//     const lista = document.querySelector('ul');
-//     const form = document.getElementById('item-form');
-//     const inputItem = document.querySelector('.input-item');
-//     const msg = document.querySelector('.msg');
-//     const clear = document.querySelector('.clear');
-//     const filterInput = document.querySelector('.input-filter');
-//     const items = lista.getElementsByTagName('li');
-
-
-//     let timeOutId;
-
-
-    
-//     form.addEventListener('submit', (e) => {
-//         e.preventDefault();
-
-//         const item = inputItem.value;
-
-//         if(item.trim() != '') {
-
-//             showMsg('Item adicionado com sucesso!', 'ok');
-
-//             lista.prepend(CreateItem(item));
-//             inputItem.value = '';
-
-//             inputItem.focus();
-            
-//             verifiedList();
-//             verifiedFilter();
-//             toogleClearButton(); 
-
-//         }  else {
-//             showMsg('Entre com um item, para adicionar algo a lista!', 'erro');
-//         }
-//     });
-
-//     filterInput.addEventListener('input', () => {
-
-//         const filterText = filterInput.value.toLowerCase();
-
-
-//         Array.from(items) .forEach(item => {
-//             const itemText = item.textContent.toLowerCase();
-
-//             if(itemText.includes(filterText)) {
-//                 item.style.display = 'flex';
-//             } else {
-//                 item.style.display = 'none';
-//             }
-//         });
-
-//         verifiedFilter();
-//         toogleClearButton();
-//     });
-
-    
-//     lista.addEventListener('click', (e) => {
-//         if(e.target && e.target.closest('button').classList.contains('remove-item')) {
-
-//             const listItem = e.target.closest('li');
-    
-//             listItem ? listItem.remove() : null;
-            
-//             if(filterInput.value != '') {
-//                 filterInput.value = ''
-
-//                 Array.from(items).forEach(item => {
-//                     item.style.display = 'flex';
-//                 });
-//             }
-
-//             verifiedList()
-//             verifiedFilter()
-//             toogleClearButton();
-
-//             showMsg('Item apagado com sucesso!', 'remove')
-
-//         }
-//     });
-
-//     function verifiedList() {
-//         if(lista.childElementCount < 2) {
-//             filterInput.style.display = 'none';
-//         } else {
-//             filterInput.style.display = 'block';
-//         }
-//     }
-
-//     function CreateText(item) {
-//         const text = document.createTextNode(item);
-//         return text;
-//     } 
-
-//     function CreateItem(item) {
-
-//         const li = document.createElement('li');
-//         const button = document.createElement('button');
         
-//         button.className = 'remove-item';
+        itemsFromStorage.push(item);
 
-//         button.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+        localStorage.setItem('items', JSON.stringify(itemsFromStorage));
+    }
+ 
 
-//         li.appendChild(CreateText(item));
-//         li.appendChild(button);
-
-//         return li;
-//     }
-
-
-//     function showMsg(text, type) {
-//         const msg = document.querySelector('.msg');
-
-//         msg.textContent = text;
-//         msg.classList.add(type);
-
-//         msg.classList.add('active');
-
-//         if(timeOutId) {
-//             clearTimeout(timeOutId);
-//         }
-
-//         timeOutId = setTimeout(() => {
-//             msg.classList.remove('active');
-//             setTimeout(() => {
-//                 msg.classList.remove(type);
-//             }, 500);
-//         }, 2000);
-//     }
+    function getItemsFromStorage() {
+        return JSON.parse(localStorage.getItem('items')) || [];
+    }
+// function get
 
 
-//     function clearALL() {
-//         lista.innerHTML = '';
+function init() {
 
-//      verifiedList() 
-//     verifiedFilter();
-//     toogleClearButton(); 
+    clear.addEventListener('click', Clear);
+    boxTheme.addEventListener('click', onClickTheme);
+    msg.addEventListener('click', onClickAlertMsg);
+    list.addEventListener('click', onClickItem);
+    filter.addEventListener('input', onFilter);
+    closeFilter.addEventListener('click', onCloseFilter);
+    form.addEventListener('submit', onAddItemSubmit);
+    document.addEventListener('DOMContentLoaded', displayItems);
 
-//         showMsg('Todos os items apagados com sucesso', 'clear')
-//     }
+    toggleTheme();  
+    checkUI();
+}
 
-//     clear.addEventListener('click', clearALL)
+init();
 
-//     function toogleClearButton() {
-//         if (lista.children.length > 1) {
-//             clear.style.display = 'block';
-//         } else {
-//             clear.style.display = 'none';
-//         }
-//     }
-
-//     function verifiedFilter() {
-//         if(filterInput.value == '') {
-//             clear.style.display = 'block'
-//         } else {
-//             clear.style.display = 'none'
-//         }
-//     }
-    
-//     verifiedList() 
-//     verifiedFilter();
-//     toogleClearButton(); 
-
-// });
-
-// // div.className = 'my-element';
-// // div.id = 'my-element';
-// // // button.setAttribute('type', 'submit');
-// // button.className = 'remove-item'
-// // button.innerHTML =  '<i class="fa-solid fa-xmark"></i>';
-// // // div.innerText = 'hello world!';
-
-// // const text = document.createTextNode('Orange Juice');
-
-// // li.appendChild(text);
-// // li.appendChild(button);
-
-// // list.prepend(li);
-
-// // console.log(li.outerHTML);;

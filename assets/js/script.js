@@ -10,20 +10,26 @@ const closeFilter = document.querySelector('.clear-filter');
 const form = document.querySelector('#form');
 const itemInput = document.querySelector('#item-input');
 const add =document.querySelector('.add');
-const edit =document.querySelector('.edit');
+const edit = document.querySelector('.edit');
+const formBtn = form.querySelector('button');
 
 let timeOutId;
+let isEditMode = false;
+
+function capitalizeFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
 
 function displayItems() {
     const itemsFromStorage = getItemsFromStorage();
 
     itemsFromStorage.forEach((item) => {
-        addItemToDOM(item);
+        const itemOk = capitalizeFirstLetter(item);
+        addItemToDOM(itemOk);
     });
 
     checkUI();
 }
-
 
 function toggleTheme() {
     const savedTheme = localStorage.getItem('theme');
@@ -55,31 +61,47 @@ function Clear() {
     confirmClear();
 }
 
-
 function onClickItem(e) {
-    if(e.target && e.target.closest('button').classList.contains('remove-item')) {
+    if(e.target && e.target.parentElement.classList.contains('remove-item')) {
         removeItem(e);
-        removeItemLocalStorage(e);
+    }
+
+    if(e.target.closest('li') && !e.target.closest('button')) {
+        setItemToEdit(e.target);
     }
 }
 
+function setItemToEdit(item) {
+    isEditMode = true;
+    console.log(item);
+     
+    Array.from(items).forEach(item => {
+        item.classList.remove('edit-mode');
+    });
+
+    item.classList.add('edit-mode');
+    formBtn.innerHTML = '<i class="fa-solid fa-pen"></i> Confirmar'
+    formBtn.classList.add('edit-mode-btn');
+
+    itemInput.value = item.textContent;
+    itemInput.focus();
+}
+
 function removeItemLocalStorage(item) {
-    item = item.target.closest('li').textContent;
     
     let itemsFromStorage = getItemsFromStorage();
 
-    // Filtrar e atualizar a variável corretamente
     itemsFromStorage = itemsFromStorage.filter(i => i !== item);
 
-    // Atualizar o localStorage
     localStorage.setItem('items', JSON.stringify(itemsFromStorage));
 }
-
 
 function removeItem(item) {
     const listItem = item.target.closest('li');
 
     listItem ? listItem.remove() : null;
+
+    removeItemLocalStorage(listItem.textContent);
 
     showFlashMsg('ok', 'Item removido com sucesso!');
     checkUI();
@@ -127,6 +149,15 @@ function checkUI() {
         clear.style.display = 'none';
         filter.style.display = 'none';
     }
+
+    formBtnRestart();
+
+    isEditMode = false;
+}
+
+function formBtnRestart() {
+    formBtn.classList.remove('edit-mode-btn');
+    formBtn.innerHTML = '+ Adicionar item';
 }
 
 function createP(classe, text) {
@@ -136,6 +167,7 @@ function createP(classe, text) {
 
     return p;
 }
+
 function createBtn(classe, text) {
     const btn = document.createElement('button');
     btn.classList.add(classe);
@@ -194,7 +226,8 @@ function onClickAlertMsg(e) {
             list.replaceChildren();
 
             msg.classList.remove('active');
-          
+            localStorage.removeItem('items');
+
             checkUI();
 
         } else {
@@ -233,10 +266,20 @@ function onAddItemSubmit(e) {
         return;
     }
 
-    addItemToDOM(newItem);
-    addItemToStorage(newItem);
+    if(isEditMode) {
+        const itemToEdit = list.querySelector('.edit-mode');
 
+        console.log(itemToEdit);
+        removeItemLocalStorage(itemToEdit.textContent);
+        itemToEdit.classList.remove('edit-mode');
+        itemToEdit.remove();
 
+        isEditMode = false;
+        
+    } 
+
+    checkIfItemExist(newItem)
+   
     checkUI();
 
     itemInput.value = '';
@@ -245,29 +288,37 @@ function onAddItemSubmit(e) {
 
 function addItemToDOM(newItem) {
 
-     list.prepend(createItem(newItem));
+    const itemOk = capitalizeFirstLetter(newItem);
+
+     list.prepend(createItem(itemOk));
 
 };
 
-    function addItemToStorage(item) { 
+function addItemToStorage(item) { 
 
-        let itemsFromStorage = getItemsFromStorage();
+    let itemsFromStorage = getItemsFromStorage();
 
-        if(itemsFromStorage.includes(item)) {
-            return;
-        }
+   
+    itemsFromStorage.push(item.toLowerCase());
+
+    localStorage.setItem('items', JSON.stringify(itemsFromStorage));
+}
+
+function checkIfItemExist(item) {
+    const itemsFromStorage = getItemsFromStorage();
+    if(itemsFromStorage.includes(item)) {
+        showFlashMsg('erro', 'Item Já existe na lista!')
+        return;
+    } else {
+        addItemToDOM(item);
+        addItemToStorage(item);
         
-        itemsFromStorage.push(item);
-
-        localStorage.setItem('items', JSON.stringify(itemsFromStorage));
     }
- 
+}
 
-    function getItemsFromStorage() {
-        return JSON.parse(localStorage.getItem('items')) || [];
-    }
-// function get
-
+function getItemsFromStorage() {
+    return JSON.parse(localStorage.getItem('items')) || [];
+}
 
 function init() {
 
@@ -285,4 +336,3 @@ function init() {
 }
 
 init();
-

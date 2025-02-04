@@ -101,6 +101,8 @@ function removeItem(item) {
 
     listItem ? listItem.remove() : null;
 
+    listItem = listItem.textContent.toLowerCase();
+
     removeItemLocalStorage(listItem.textContent);
 
     showFlashMsg('ok', 'Item removido com sucesso!');

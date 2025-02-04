@@ -91,7 +91,9 @@ function removeItemLocalStorage(item) {
     
     let itemsFromStorage = getItemsFromStorage();
 
-    itemsFromStorage = itemsFromStorage.filter(i => i !== item);
+    const itemOk = item.toLowerCase();
+
+    itemsFromStorage = itemsFromStorage.filter(i => i !== itemOk);
 
     localStorage.setItem('items', JSON.stringify(itemsFromStorage));
 }
@@ -101,7 +103,7 @@ function removeItem(item) {
 
     listItem ? listItem.remove() : null;
 
-    listItem = listItem.textContent.toLowerCase();
+    
 
     removeItemLocalStorage(listItem.textContent);
 

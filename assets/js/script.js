@@ -12,6 +12,7 @@ const itemInput = document.querySelector('#item-input');
 const add =document.querySelector('.add');
 const edit = document.querySelector('.edit');
 const formBtn = form.querySelector('button');
+const fy = document.querySelector('.color');
 
 let timeOutId;
 let isEditMode = false;
@@ -49,9 +50,11 @@ function onClickTheme() {
     if (body.classList.contains('dark')) {
         boxTheme.innerHTML = `<img src="./assets/img/sun-regular.svg" alt="">`;
         localStorage.setItem('theme', 'dark'); 
+        // fy.style.color = '#FBD38D';
     } else {
         boxTheme.innerHTML = `<img src="./assets/img/moon.png" alt="">`;
         localStorage.setItem('theme', ''); 
+        // fy.style.color = '#DF8DFB';
         // localStorage.clear('theme'); 
     }
 }

@@ -74,8 +74,8 @@ body {
 
 .color {
     color: var(--text-color);
-    /* font-size: 3rem; */
-}
+    font-size: 3rem;
+}  
 
 .box-theme {
     background-color: var(--dark-mode);
@@ -174,9 +174,9 @@ body {
 }
 
 .list-items {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    grid-template-columns: 1fr 1fr;
     gap: 1rem;
     margin: 1rem 0 4rem 0;
 }
